@@ -1,0 +1,300 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Thème AfriDigit — jaune, blanc, bleu                                */
+/* ------------------------------------------------------------------ */
+
+@theme inline {
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #172554;
+
+  --color-sun-200: #fef08a;
+  --color-sun-300: #fde047;
+  --color-sun-400: #facc15;
+  --color-sun-500: #eab308;
+
+  --color-ink: #0f172a;
+  --color-ink-soft: #475569;
+}
+
+:root {
+  --sun: #facc15;
+  --sun-hover: #fde047;
+  --brand: #1d4ed8;
+  --brand-hover: #1e40af;
+  --ring: #1d4ed8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-ink);
+}
+
+/* ------------------------------------------------------------------ */
+/* Effet verre discret                                                 */
+/* ------------------------------------------------------------------ */
+
+@utility glass {
+  background-color: rgb(255 255 255 / 0.7);
+  backface-visibility: hidden;
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow: 0 12px 40px -18px rgb(23 37 84 / 0.25);
+}
+
+/* Variante sombre pour un texte clair sur fond bleu. */
+@utility glass-blue {
+  background-color: rgb(29 78 216 / 0.35);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgb(255 255 255 / 0.22);
+}
+
+/* ------------------------------------------------------------------ */
+/* Composants réutilisables                                            */
+/* ------------------------------------------------------------------ */
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    line-height: 1.1;
+    padding: 0.7rem 1.35rem;
+    cursor: pointer;
+    text-align: center;
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.25s ease,
+      background-color 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-yellow {
+    background-color: var(--sun);
+    color: #17204d;
+    box-shadow: 0 12px 24px -10px rgb(234 179 8 / 0.65);
+  }
+  .btn-yellow:hover:not(:disabled) {
+    background-color: var(--sun-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 28px -10px rgb(234 179 8 / 0.75);
+  }
+
+  .btn-blue {
+    background-color: var(--brand);
+    color: #fff;
+    box-shadow: 0 12px 24px -12px rgb(29 78 216 / 0.55);
+  }
+  .btn-blue:hover:not(:disabled) {
+    background-color: var(--brand-hover);
+    transform: translateY(-2px);
+  }
+
+  .btn-navy {
+    background-color: #17204d;
+    color: #fff;
+  }
+  .btn-navy:hover:not(:disabled) {
+    background-color: #0f1533;
+    transform: translateY(-2px);
+  }
+
+  .btn-red {
+    background-color: #dc2626;
+    color: #fff;
+    box-shadow: 0 12px 24px -12px rgb(220 38 38 / 0.6);
+  }
+  .btn-red:hover:not(:disabled) {
+    background-color: #b91c1c;
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    background-color: rgb(255 255 255 / 0.65);
+    color: var(--brand);
+    border: 1.5px solid rgb(29 78 216 / 0.35);
+  }
+  .btn-outline:hover:not(:disabled) {
+    border-color: rgb(29 78 216 / 0.7);
+    background-color: rgb(255 255 255 / 0.9);
+    transform: translateY(-2px);
+  }
+
+  .btn-icon {
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    color: var(--color-ink-soft);
+    border: 1px solid rgb(15 23 42 / 0.1);
+    background-color: #fff;
+  }
+  .btn-icon:hover:not(:disabled) {
+    color: var(--brand);
+    border-color: rgb(29 78 216 / 0.4);
+  }
+  .btn-icon-danger:hover:not(:disabled) {
+    color: #b91c1c;
+    border-color: rgb(185 28 28 / 0.4);
+  }
+  .btn-icon-danger:focus-visible {
+    outline-color: #b91c1c;
+  }
+
+  .input {
+    width: 100%;
+    border-radius: 0.85rem;
+    border: 1.5px solid rgb(15 23 42 / 0.14);
+    background-color: #fff;
+    padding: 0.62rem 0.85rem;
+    font-size: 0.95rem;
+    color: var(--color-ink);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .input::placeholder {
+    color: rgb(71 85 105 / 0.55);
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgb(29 78 216 / 0.14);
+  }
+  .input[aria-invalid="true"] {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgb(220 38 38 / 0.12);
+  }
+
+  .field-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: #1e293b;
+    margin-bottom: 0.35rem;
+  }
+
+  /* Survol doux des cartes produit. */
+  .card-lift {
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s ease;
+  }
+  .card-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 50px -24px rgb(23 37 84 / 0.35);
+  }
+}
+
+/*------------------------------------------------------------------ */
+/* Accessibilité : liseré visible au clavier                           */
+/* ------------------------------------------------------------------ */
+
+:focus-visible {
+  outline: 2.5px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Animations légères                                                  */
+/* ------------------------------------------------------------------ */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Apparition au défilement (gérée par components/reveal.tsx). */
+.reveal {
+  opacity: 0;
+}
+.reveal.revealed {
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.revealed {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+.delay-1 {
+  animation-delay: 0.12s;
+}
+.delay-2 {
+  animation-delay: 0.24s;
+}
+.delay-3 {
+  animation-delay: 0.36s;
+}
+.delay-4 {
+  animation-delay: 0.48s;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -26px, 0) scale(1.06);
+  }
+}
+
+.animate-drift {
+  animation: drift 11s ease-in-out infinite;
+}
+.animate-drift-slow {
+  animation: drift 16s ease-in-out infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
