@@ -65,8 +65,17 @@ export async function clearAdminSession(): Promise<void> {
  * Garde de page : redirige vers la connexion générique si aucune session
  * valide. La vraie clé d'accès reste la vérification serveur (signature +
  * adresse autorisée) — le front n'est qu'un habillage.
+ *
+ * Si la configuration serveur est absente (ADMIN_SESSION_SECRET), on
+ * signale discrètement « indisponible » plutôt que d'ouvrir le formulaire
+ * pour rien. (Comportement repris de l'ancien proxy, module supprimé pour
+ * compatibilité avec le runtime de déploiement.)
  */
 export async function requireAdminSession(): Promise<AdminSession> {
+  const secret = getAdminSessionSecret();
+  if (!secret) {
+    redirect("/connexion?state=not_configured");
+  }
   const session = await getAdminSession();
   if (!session) {
     redirect("/connexion");

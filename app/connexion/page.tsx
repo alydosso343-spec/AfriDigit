@@ -1,7 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { getAdminSession } from "@/lib/admin-guard";
 import LoginForm from "./login-form";
 
 export const metadata: Metadata = {
@@ -24,6 +26,13 @@ type ConnexionPageProps = {
  * session mène à l'espace de gestion.
  */
 export default async function ConnexionPage({ searchParams }: ConnexionPageProps) {
+  // Déjà identifiée : inutile de re-remplir le formulaire, direction
+  // l'espace de gestion. (Ancien comportement du proxy, désormais ici.)
+  const session = await getAdminSession();
+  if (session) {
+    redirect("/admin");
+  }
+
   const { err, state } = await searchParams;
 
   return (

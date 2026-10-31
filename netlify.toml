@@ -1,7 +1,11 @@
 # Netlify — configuration de construction (site Next.js)
 # Docs : https://docs.netlify.com/integrations/frameworks/next-js/overview/
 [build]
-  command = "npm run build"
+  # ⚠️ Turbopack (défaut Next 16) produit des fichiers de chunk dont le nom
+  # contient des crochets, que le bundler de fonctions Edge de Netlify
+  # (runtime v5.16.5) ne sait pas copier/résoudre. On conserve le mode
+  # Webpack officiellement supporté pour les déploiements.
+  command = "npm run build -- --webpack"
   publish = ".next"
 
 # Runtime officiel Netlify pour Next.js (rendu serveur, Server Actions,
