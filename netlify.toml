@@ -1,0 +1,10 @@
+# Netlify — configuration de construction (site Next.js)
+# Docs : https://docs.netlify.com/integrations/frameworks/next-js/overview/
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Runtime officiel Netlify pour Next.js (rendu serveur, Server Actions,
+# proxy middleware). Auto-installé par Netlify s'il est absent.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

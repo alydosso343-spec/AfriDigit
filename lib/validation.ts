@@ -105,6 +105,49 @@ export function zodToFieldErrors(error: z.ZodError): Record<string, string> {
   return fieldErrors;
 }
 
+/** Expression basique de validation d'une adresse e-mail. */
+export function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+/**
+ * Schéma de l'inscription client : prénom + e-mail + mot de passe.
+ * Le mot de passe (8 à 72 caractères, limite Supabase Auth) n'est jamais
+ * stocké ici : Supabase Auth le hache côté serveur.
+ */
+export const signUpSchema = z.object({
+  name: z
+    .string({ message: "Le prénom est obligatoire." })
+    .trim()
+    .min(2, "Le prénom doit contenir au moins 2 caractères.")
+    .max(40, "Le prénom ne peut pas dépasser 40 caractères."),
+  email: z
+    .string({ message: "L'adresse e-mail est obligatoire." })
+    .trim()
+    .toLowerCase()
+    .max(160, "L'adresse e-mail est trop longue.")
+    .refine(isValidEmail, "Cette adresse e-mail n'est pas valide."),
+  password: z
+    .string({ message: "Le mot de passe est obligatoire." })
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
+    .max(72, "Le mot de passe ne peut pas dépasser 72 caractères."),
+});
+
+/** Schéma de la connexion client (e-mail + mot de passe). */
+export const signInSchema = z.object({
+  email: z
+    .string({ message: "L'adresse e-mail est obligatoire." })
+    .trim()
+    .toLowerCase()
+    .max(160, "L'adresse e-mail est trop longue.")
+    .refine(isValidEmail, "Cette adresse e-mail n'est pas valide."),
+  password: z
+    .string({ message: "Le mot de passe est obligatoire." })
+    .min(1, "Le mot de passe est obligatoire."),
+});
+
+export type SignUpInput = z.infer<typeof signUpSchema>;
+
 /** Extension de fichier correspondant à un type MIME image. */
 export function extensionFromMime(mime: string): string {
   switch (mime) {

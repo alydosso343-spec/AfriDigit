@@ -32,6 +32,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# backend local (dev) et images téléversées
+# backend local (dev) et images tï¿½lï¿½versï¿½es
 /data/
 /public/uploads/
+
+# Local Netlify folder
+.netlify

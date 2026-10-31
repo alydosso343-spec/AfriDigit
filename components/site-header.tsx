@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { LogIn, Menu, ShieldCheck, ShoppingBag, X } from "lucide-react";
+import { LogIn, Menu, ShieldCheck, ShoppingBag, UserRound, X } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const NAV_LINKS = [
@@ -23,10 +23,21 @@ function linkClass(isActive: boolean): string {
  * En-tête du site public. Le lien de la page courante est surligné d'une
  * barre bleue pleine (aria-current="page") : on sait toujours sur quel
  * onglet / volet on se trouve. Menu déroulant sur mobile.
- * `isAdmin` (lu côté serveur dans le layout) : affiche « Espace admin »
- * au lieu du bouton « Connexion ».
+ *
+ * Accès adaptés selon la session lue côté serveur :
+ *  - `isAdmin`      → pastille discrète « Espace admin » (rien n'annonce
+ *    l'administration tant que la session n'est pas ouverte : l'admin
+ *    ouvre /connexion directement par l'adresse) ;
+ *  - `customerName` → « Bonjour {prénom} » vers l'espace client ;
+ *  - visiteur       → « S'inscrire » + « Connexion » (espace client).
  */
-export default function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
+export default function SiteHeader({
+  isAdmin = false,
+  customerName,
+}: {
+  isAdmin?: boolean;
+  customerName?: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -45,18 +56,6 @@ export default function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(href + "/");
   }
-
-  const accessButton = isAdmin ? (
-    <>
-      <ShieldCheck size={17} aria-hidden />
-      Espace admin
-    </>
-  ) : (
-    <>
-      <LogIn size={17} aria-hidden />
-      Connexion
-    </>
-  );
 
   return (
     <header className="relative z-50 px-3 pt-3 sm:px-5 sm:pt-4">
@@ -87,12 +86,36 @@ export default function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link
-              href={isAdmin ? "/admin" : "/connexion"}
-              className="btn btn-outline hidden text-sm sm:inline-flex"
-            >
-              {accessButton}
-            </Link>
+            {isAdmin ? (
+              <Link href="/admin" className="btn btn-outline hidden text-sm sm:inline-flex">
+                <ShieldCheck size={17} aria-hidden />
+                Espace admin
+              </Link>
+            ) : null}
+
+            {customerName ? (
+              <Link href="/compte" className="btn btn-outline hidden text-sm sm:inline-flex">
+                <UserRound size={17} aria-hidden />
+                <span className="max-w-36 truncate">Bonjour {customerName}</span>
+              </Link>
+            ) : isAdmin ? null : (
+              <>
+                <Link
+                  href="/compte/inscription"
+                  className="hidden rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-800 sm:inline-flex"
+                >
+                  S&apos;inscrire
+                </Link>
+                <Link
+                  href="/compte/connexion"
+                  className="btn btn-outline hidden text-sm sm:inline-flex"
+                >
+                  <LogIn size={17} aria-hidden />
+                  Connexion
+                </Link>
+              </>
+            )}
+
             <Link href="/produits" className="btn btn-yellow hidden text-sm sm:inline-flex">
               <ShoppingBag size={17} aria-hidden />
               Découvrir les produits
@@ -135,13 +158,29 @@ export default function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
                 ))}
               </ul>
             </nav>
-            <Link
-              href={isAdmin ? "/admin" : "/connexion"}
-              onClick={close}
-              className="btn btn-outline mt-3 w-full"
-            >
-              {accessButton}
-            </Link>
+            {isAdmin ? (
+              <Link href="/admin" onClick={close} className="btn btn-outline mt-3 w-full">
+                <ShieldCheck size={17} aria-hidden />
+                Espace admin
+              </Link>
+            ) : null}
+            {customerName ? (
+              <Link href="/compte" onClick={close} className="btn btn-outline mt-3 w-full">
+                <UserRound size={17} aria-hidden />
+                Bonjour {customerName}
+              </Link>
+            ) : isAdmin ? null : (
+              <>
+                <Link href="/compte/inscription" onClick={close} className="btn btn-outline mt-3 w-full">
+                  <UserRound size={17} aria-hidden />
+                  S&apos;inscrire
+                </Link>
+                <Link href="/compte/connexion" onClick={close} className="btn btn-outline mt-3 w-full">
+                  <LogIn size={17} aria-hidden />
+                  Connexion
+                </Link>
+              </>
+            )}
             <Link href="/produits" onClick={close} className="btn btn-yellow mt-3 w-full">
               <ShoppingBag size={17} aria-hidden />
               Découvrir les produits
