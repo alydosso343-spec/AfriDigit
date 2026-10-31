@@ -3,10 +3,8 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { LoaderCircle } from "lucide-react";
-import {
-  INITIAL_AUTH_STATE,
-  signUpCustomer,
-} from "@/app/account-actions";
+import { INITIAL_AUTH_STATE } from "@/lib/auth-form-state";
+import { signUpCustomer } from "@/app/account-actions";
 
 /**
  * Formulaire d'inscription client. La validationZod est partagée avec le

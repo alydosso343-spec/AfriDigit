@@ -18,12 +18,12 @@ export type CustomerSession = {
 };
 
 /** Client Supabase connecté au stockage de cookies du rendu / des actions. */
-export function createCookieSupabaseClient() {
+export async function createCookieSupabaseClient() {
   const env = getSupabaseEnv();
   if (!env) {
     return null;
   }
-  const store = cookies();
+  const store = await cookies();
 
   return createServerClient(env.url, env.anonKey, {
     cookies: {
@@ -48,13 +48,13 @@ export function createCookieSupabaseClient() {
  * Renvoie le client connecté si Supabase Auth (espace client) est configuré.
  * `null` tant que les clés Supabase ne sont pas renseignées.
  */
-export function getOptionalSupabaseAuth() {
+export async function getOptionalSupabaseAuth() {
   return createCookieSupabaseClient();
 }
 
 /** Session du visiteur connecté, ou `null` (aucune info sensible ici). */
 export async function getCustomerSession(): Promise<CustomerSession | null> {
-  const supabase = createCookieSupabaseClient();
+  const supabase = await createCookieSupabaseClient();
   if (!supabase) {
     return null;
   }

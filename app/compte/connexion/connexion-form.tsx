@@ -2,10 +2,8 @@
 
 import { useActionState } from "react";
 import { LoaderCircle } from "lucide-react";
-import {
-  INITIAL_AUTH_STATE,
-  signInCustomer,
-} from "@/app/account-actions";
+import { INITIAL_AUTH_STATE } from "@/lib/auth-form-state";
+import { signInCustomer } from "@/app/account-actions";
 
 /**
  * Formulaire de connexion CLIENT. Message d'erreur volontairement unique

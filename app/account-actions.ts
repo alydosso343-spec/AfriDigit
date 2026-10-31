@@ -7,20 +7,13 @@ import {
   zodToFieldErrors,
 } from "@/lib/validation";
 import { getOptionalSupabaseAuth } from "@/lib/supabase/auth-server";
+import type { AuthActionState } from "@/lib/auth-form-state";
 
 /**
  * Server Actions de L'ESPACE CLIENT (visiteurs) :
  * inscription, connexion, déconnexion — toutes portées par Supabase Auth.
  * Aucun mot de passe n'est stocké ici : il est haché par Supabase.
  */
-
-export type AuthActionState = {
-  status: "idle" | "error" | "success";
-  message?: string;
-  fieldErrors?: Record<string, string>;
-};
-
-export const INITIAL_AUTH_STATE: AuthActionState = { status: "idle" };
 
 /** Création d'un compte client (prénom, e-mail, mot de passe). */
 export async function signUpCustomer(
@@ -36,7 +29,7 @@ export async function signUpCustomer(
     return { status: "error", fieldErrors: zodToFieldErrors(parsed.error) };
   }
 
-  const supabase = getOptionalSupabaseAuth();
+  const supabase = await getOptionalSupabaseAuth();
   if (!supabase) {
     return {
       status: "error",
@@ -96,7 +89,7 @@ export async function signInCustomer(
     return { status: "error", fieldErrors: zodToFieldErrors(parsed.error) };
   }
 
-  const supabase = getOptionalSupabaseAuth();
+  const supabase = await getOptionalSupabaseAuth();
   if (!supabase) {
     return {
       status: "error",
@@ -144,7 +137,7 @@ export async function signInCustomer(
  */
 export async function signOutCustomer(): Promise<void> {
   const { createCookieSupabaseClient } = await import("@/lib/supabase/auth-server");
-  const supabase = createCookieSupabaseClient();
+  const supabase = await createCookieSupabaseClient();
   if (supabase) {
     await supabase.auth.signOut();
   }
