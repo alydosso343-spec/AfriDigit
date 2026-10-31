@@ -52,6 +52,14 @@ export async function signUpCustomer(
           message: "Un compte existe déjà avec cette adresse : connectez-vous.",
         };
       }
+      if (raw.includes("rate limit") || raw.includes("too many")) {
+        // Quota d'e-mails du plan gratuit Supabase (ex. confirmation) épuisé.
+        return {
+          status: "error",
+          message:
+            "Trop d'inscriptions à la minute : réessayez dans une heure.",
+        };
+      }
       return {
         status: "error",
         message: "La création du compte a échoué. Réessayez dans un instant.",
