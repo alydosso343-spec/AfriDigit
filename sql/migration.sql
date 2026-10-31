@@ -15,9 +15,18 @@
 
 -- ----------------------------------------------------------------------------
 -- 0. Nettoyage de l'ancien modèle (sécurité si une ancienne migration a tourné)
+--    NB : sur une base NEUVE, `public.products` n'existe pas encore — sur
+--    PostgreSQL, `drop policy ... on <table absente>` lève l'erreur 42P01,
+--    même avec `if exists`. On ne nettoie donc que si la table est là.
 -- ----------------------------------------------------------------------------
-drop policy if exists "afridigit: gestion réservée à l'admin"
-  on public.products;
+do $$
+begin
+  if to_regclass('public.products') is not null then
+    drop policy if exists "afridigit: gestion réservée à l'admin"
+      on public.products;
+  end if;
+end $$;
+
 drop policy if exists "afridigit: téléversement admin"
   on storage.objects;
 drop policy if exists "afridigit: modification admin des images"
