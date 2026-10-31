@@ -1,6 +1,6 @@
 # AfriDigit
 
-Boutique moderne, responsive et **multi-pages** en français pour vendre des produits digitaux (ebooks, formations, outils). Les visiteurs parcourent la vitrine (`/`, `/produits`, `/comment-ca-marche`) et achètent en un clic sur **Chariow** — le paiement n'est jamais réalisé sur le site lui-même. Une **administration protégée et discrète** permet de gérer les produits : elle est invisible du grand public (page de connexion générique `/connexion`, aucune mention d'admin, adresse et code jamais affichés).
+Boutique moderne, responsive et **multi-pages** en français pour vendre des produits digitaux (ebooks, formations, outils). Les visiteurs parcourent la vitrine (`/`, `/produits`, `/comment-ca-marche`) et achètent en un clic sur **Chariow** — le paiement n'est jamais réalisé sur le site lui-même. Une **administration protégée et discrète** permet de gérer les produits : elle est invisible du grand public (page de connexion générique `/connexion`, aucune mention d'admin, adresse et code jamais affichés). Les **clients** disposent en outre d'un espace personnel : inscription (`/compte/inscription`), connexion (`/compte/connexion`) et profil (`/compte`), portés par Supabase Auth — aucun mot de passe n'est stocké par le site.
 
 ---
 
@@ -8,7 +8,7 @@ Boutique moderne, responsive et **multi-pages** en français pour vendre des pro
 
 | Choix | Rôle | Pourquoi |
 |---|---|---|
-| **Next.js 16** (App Router, TypeScript) | Framework du site | Vraies pages (routing natif), rendu serveur, Server Actions sécurisées, déploiement Vercel 1-clic |
+| **Next.js 16** (App Router, TypeScript) | Framework du site | Vraies pages (routing natif), rendu serveur, Server Actions sécurisées, déploiement Netlify (`netlify.toml` fourni) |
 | **Tailwind CSS v4** | Style | Vitesse, design system propre (jaune / blanc / bleu, effet verre, animations) |
 | **Backend produits** | Persistance | **Local par défaut** (fichier JSON + images sur disque, zéro configuration) ; **Supabase** optionnel pour la production |
 | **Zod** | Validation des formulaires | Schémas partagés client/serveur, messages d'erreur en français |
@@ -126,6 +126,24 @@ La protection est **en profondeur**, jamais en façade — et volontairement **i
 
 ---
 
+## 6b. Espace client (visiteurs)
+
+Trois pages, aucune fuite d'information tant que l'on n'est pas connecté :
+
+| Route | Rôle |
+|---|---|
+| `/compte/inscription` | création de compte (prénom, e-mail, mot de passe ≥ 8 caractères) |
+| `/compte/connexion` | connexion du client (noindex) |
+| `/compte` | profil de la personne connectée + déconnexion (page protégée) |
+
+- **Moteur d'authentification** : Supabase Auth (`@supabase/ssr`, sessions en cookies). Le site ne manipule jamais les mots de passe : Supabase les hache et gère les sessions. Actions serveur dans `app/account-actions.ts`, session lue dans `lib/supabase/auth-server.ts`.
+- **Sans clés Supabase** : les formulaires répondent « L'espace client sera disponible à la mise en production du site. » — comportement volontaire et discret.
+- **Après inscription** : si les comptes sont auto-confirmés dans le réglage Supabase, la session est posée et l'utilisateur arrive directement sur `/compte` ; sinon un e-mail de confirmation part et il est renvoyé vers `/compte/connexion?inscrit=1` (bandeau « Compte créé 🎉 »).
+- **En-tête public** : `S'inscrire` / `Connexion` pour les visiteurs, « Bonjour {prénom} » une fois connecté, pastille discrète `Espace admin` uniquement quand une session admin est active.
+- **Clés requises** : les 3 variables Supabase (mêmes que le backend produits) + exécuter `sql/migration.sql`.
+
+---
+
 ## 7. États gérés par le site
 
 - **Chargement** : squelettes de cartes animées (Suspense).
@@ -144,6 +162,7 @@ La protection est **en profondeur**, jamais en façade — et volontairement **i
 | Produits non persistés après redémarrage (local) | En mode local les écritures vont dans `data/products.json` : ne le supprimez que pour réinitialiser. |
 | Connexion OK mais écritures refusées (mode Supabase) | `SUPABASE_SERVICE_ROLE_KEY` (ou URL) absentes/mal recopiées — ou migration non jouée. |
 | `new row violates row-level security policy` | La migration n'a pas été jouée, ou l'anonyme essaie d'écrire : vérifie `sql/migration.sql` et que les écritures passent par les Server Actions. |
+| « L'espace client sera disponible à la mise en production… » | Normal tant que les 3 clés Supabase ne sont pas renseignées (c'est le comportement gracieux voulu). |
 | Téléversement refusé (Supabase) | Vérifier que la migration (bucket + policy lecture) a bien été exécutée. |
 | Prix affiché sans devise correcte | `CURRENCY` mal orthographié (ex. `XOF`). |
 | Session « perdue » tout le temps | `ADMIN_SESSION_SECRET` a changé (reconnectez-vous : seuls les cookies signés avec le bon secret passent). |
@@ -159,12 +178,17 @@ app/
     page.tsx               → accueil : héros + 3 produits phares + étapes
     produits/page.tsx      → catalogue complet
     comment-ca-marche/page.tsx → démarche détaillée
-  actions.ts               → Server Actions (connexion, déconnexion, CRUD produits, images)
   connexion/
     page.tsx               → page de connexion générique et discrète (noindex)
     login-form.tsx         → formulaire client (useActionState)
   admin/(dashboard)/layout.tsx → garde serveur requireAdminSession + coquille admin
   admin/(dashboard)/page.tsx   → tableau de bord produits
+  compte/
+    page.tsx               → espace personnel du client (protégé)
+    inscription/           → création de compte (formulaire + page)
+    connexion/             → connexion client (formulaire + page)
+  account-actions.ts       → Server Actions client (inscription/connexion/déconnexion)
+  actions.ts               → Server Actions admin (connexion, CRUD produits, images)
 components/
   site-header.tsx / hero.tsx / how-it-works.tsx / site-footer.tsx
   featured-products.tsx    → 3 produits phares de l'accueil
@@ -182,8 +206,10 @@ lib/
   store/local-store.ts     → backend local (data/products.json + public/uploads)
   store/supabase-store.ts  → backend Supabase (anon lecture / service_role écritures)
   supabase/server.ts       → clients Supabase (anon + service_role)
+  supabase/auth-server.ts  → session espace client (Supabase Auth via cookies)
+  auth-form-state.ts       → état des formulaires d'authentification client
 sql/migration.sql          → migration Supabase à exécuter (option production)
-proxy.ts                   → garde d'accès Edge (matcher /admin/* + /connexion)
+netlify.toml               → configuration de déploiement Netlify (build webpack + runtime Next)
 .env.example               → modèle de variables à copier en .env.local
 ```
 
