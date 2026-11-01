@@ -1,0 +1,9 @@
+# AfriDigit — pages privées exclues de l'indexation
+User-agent: *
+Disallow: /admin
+Disallow: /admin/
+Disallow: /connexion
+Disallow: /compte
+Disallow: /compte/connexion
+
+# Autorisé : la vitrine, la page d'inscription client, /produits, etc.

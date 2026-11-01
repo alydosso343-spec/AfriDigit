@@ -1,10 +1,15 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ExternalLink, LogOut } from "lucide-react";
 import { signOutAdmin } from "@/app/actions";
 import { requireAdminSession } from "@/lib/admin-guard";
 import { LogoMark } from "@/components/logo";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /**
  * Coquille du tableau de bord d'administration.
